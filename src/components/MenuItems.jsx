@@ -19,7 +19,7 @@ const MenuItems = ({ setPage }) => {
       const { data, error } = await supabase
         .from('products')
         .select('*');
-      
+
       if (error) throw error;
 
       if (data && data.length > 0) {
@@ -39,8 +39,8 @@ const MenuItems = ({ setPage }) => {
     }
   };
 
-  const filteredItems = filterCategory === 'All' 
-    ? products 
+  const filteredItems = filterCategory === 'All'
+    ? products
     : products.filter(item => item.category === filterCategory);
 
   return (
@@ -80,11 +80,10 @@ const MenuItems = ({ setPage }) => {
             <button
               key={cat}
               onClick={() => setFilterCategory(cat)}
-              className={`px-4 py-2 rounded-full font-medium transition-colors ${
-                filterCategory === cat 
-                  ? 'bg-[#FF9017] text-white' 
+              className={`px-4 py-2 rounded-full font-medium transition-colors ${filterCategory === cat
+                  ? 'bg-[#FF9017] text-white'
                   : 'bg-white border border-shade-border text-dark hover:bg-shade'
-              }`}
+                }`}
             >
               {cat}
             </button>
@@ -138,7 +137,7 @@ const MenuItems = ({ setPage }) => {
                 </div>
 
                 {/* Wishlist Button */}
-                <button 
+                <button
                   className="absolute top-2 right-2 w-8 h-8 bg-white border border-[#DEE2E7] rounded-full flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -148,10 +147,10 @@ const MenuItems = ({ setPage }) => {
                 {/* Product Image */}
                 <div className="aspect-square flex items-center justify-center mb-4 bg-[#F7F7F7] rounded-lg p-4">
                   {item.image_url ? (
-                    <img 
-                      src={item.image_url} 
-                      alt={item.name} 
-                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300" 
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
                     />
                   ) : (
                     <div className="text-[#8B96A5]">No image</div>
@@ -161,7 +160,7 @@ const MenuItems = ({ setPage }) => {
                 {/* Product Info */}
                 <div className="space-y-2">
                   <h3 className="font-medium text-dark line-clamp-2">{item.name}</h3>
-                  
+
                   {/* Rating */}
                   <div className="flex items-center gap-1">
                     <div className="flex gap-0.5">
@@ -191,10 +190,10 @@ const MenuItems = ({ setPage }) => {
                 {/* Product Image */}
                 <div className="w-[120px] h-[120px] flex-shrink-0 bg-[#F7F7F7] rounded-lg p-4 flex items-center justify-center">
                   {item.image_url ? (
-                    <img 
-                      src={item.image_url} 
-                      alt={item.name} 
-                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300" 
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
                     />
                   ) : (
                     <div className="text-[#8B96A5]">No image</div>
@@ -207,7 +206,7 @@ const MenuItems = ({ setPage }) => {
                     <div>
                       <span className="text-xs text-secondary">{item.category}</span>
                       <h3 className="font-medium text-dark">{item.name}</h3>
-                      
+
                       {/* Rating */}
                       <div className="flex items-center gap-1 mt-1">
                         <div className="flex gap-0.5">
@@ -218,11 +217,11 @@ const MenuItems = ({ setPage }) => {
                         <span className="text-xs text-secondary">({item.reviews_count || 0})</span>
                       </div>
                     </div>
-                    
+
                     {/* Price & Wishlist */}
                     <div className="flex flex-col items-end gap-2">
                       <span className="text-xl font-bold text-[#1C1C1C]">Rs. {item.price}</span>
-                      <button 
+                      <button
                         className="w-10 h-10 bg-white border border-[#DEE2E7] rounded-full flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all"
                         onClick={(e) => e.stopPropagation()}
                       >

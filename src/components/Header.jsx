@@ -164,14 +164,14 @@ const Header = ({ setPage, cartCount, favoritesCount, confirmedOrdersCount, isAd
       <div className="border-t border-shade-border bg-white lg:overflow-visible no-scrollbar">
         <div className="container py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between whitespace-nowrap gap-3 sm:gap-4">
           <nav className="flex flex-wrap items-center gap-4 sm:gap-6 font-medium text-dark text-sm sm:text-base w-full pb-1 sm:pb-0">
-             <div className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors" onClick={() => setPage('listing')}>
-               <Menu className="w-5 h-5" />
-               <span>All Categories</span>
-             </div>
-             <a href="#" className="hover:text-primary transition-colors" onClick={(e) => { e.preventDefault(); setPage('hot-offers'); }}>Hot Offers</a>
-             <a href="#" className="hover:text-primary transition-colors" onClick={(e) => { e.preventDefault(); setPage('gift-boxes'); }}>Gift Boxes</a>
+            <div className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors" onClick={() => setPage('listing')}>
+              <Menu className="w-5 h-5" />
+              <span>All Categories</span>
+            </div>
+            <a href="#" className="hover:text-primary transition-colors" onClick={(e) => { e.preventDefault(); setPage('hot-offers'); }}>Hot Offers</a>
+            <a href="#" className="hover:text-primary transition-colors" onClick={(e) => { e.preventDefault(); setPage('gift-boxes'); }}>Gift Boxes</a>
             <a href="#" className="hover:text-primary transition-colors" onClick={(e) => { e.preventDefault(); setPage('projects'); }}>Projects</a>
-             <a href="#" className="hover:text-primary transition-colors" onClick={(e) => { e.preventDefault(); setPage('menu-items'); }}>Menu Items</a>
+            <a href="#" className="hover:text-primary transition-colors" onClick={(e) => { e.preventDefault(); setPage('menu-items'); }}>Menu Items</a>
             {isAdmin && (
               <span
                 className="bg-primary/10 text-primary px-3 py-1 rounded-md font-bold cursor-pointer hover:bg-primary/20 transition-all border border-primary/20 flex items-center"
@@ -191,26 +191,26 @@ const Header = ({ setPage, cartCount, favoritesCount, confirmedOrdersCount, isAd
               {showHelpDropdown && (
                 <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-[50vh] overflow-y-auto">
                   {helpItems.map((item, idx) => (
-                     <div
-                       key={idx}
-                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm flex items-center gap-2 transition-colors"
-                       onClick={() => {
-                         setShowHelpDropdown(false);
-                         if (idx === 0) setPage('help-center');
-                         else if (idx === 1) setPage('contact-us');
-                         else if (idx === 2) setPage('shipping-info');
-                         else if (idx === 3) setPage('returns-info');
-                         else setPage('faq');
-                       }}
-                     >
-                       {idx === 0 && <HelpCircle className="w-4 h-4" />}
-                       {idx === 1 && <MessageSquare className="w-4 h-4" />}
-                       {idx === 2 && <Truck className="w-4 h-4" />}
-                       {idx === 3 && <RotateCcw className="w-4 h-4" />}
-                       {idx === 4 && <HelpCircle className="w-4 h-4" />}
-                       <span>{item}</span>
-                     </div>
-                   ))}
+                    <div
+                      key={idx}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm flex items-center gap-2 transition-colors"
+                      onClick={() => {
+                        setShowHelpDropdown(false);
+                        if (idx === 0) setPage('help-center');
+                        else if (idx === 1) setPage('contact-us');
+                        else if (idx === 2) setPage('shipping-info');
+                        else if (idx === 3) setPage('returns-info');
+                        else setPage('faq');
+                      }}
+                    >
+                      {idx === 0 && <HelpCircle className="w-4 h-4" />}
+                      {idx === 1 && <MessageSquare className="w-4 h-4" />}
+                      {idx === 2 && <Truck className="w-4 h-4" />}
+                      {idx === 3 && <RotateCcw className="w-4 h-4" />}
+                      {idx === 4 && <HelpCircle className="w-4 h-4" />}
+                      <span>{item}</span>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -218,7 +218,7 @@ const Header = ({ setPage, cartCount, favoritesCount, confirmedOrdersCount, isAd
 
           <div className="flex items-center justify-end gap-4 sm:gap-6 font-medium text-dark w-full sm:w-auto text-sm sm:text-base">
             {/* Notification Bell */}
-            <div 
+            <div
               className="relative cursor-pointer hover:text-primary transition-colors group"
               onClick={() => setPage('notifications')}
             >

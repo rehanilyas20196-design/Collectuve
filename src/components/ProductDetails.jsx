@@ -1,91 +1,35 @@
 import React from 'react';
 import { Star, Heart, MessageSquare, ShoppingBag, ShieldCheck, Globe, ChevronRight, ChevronDown, Check, Send, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useRelatedProducts, useReviews } from '../hooks/useProducts';
 
-// Main Product Image
-import mainImg from '../assets/Image/tech/image 34.png';
-import thumb1 from '../assets/Image/tech/image 33.png';
-import thumb2 from '../assets/Image/tech/image 32.png';
-import thumb3 from '../assets/Image/tech/6.png';
-import thumb4 from '../assets/Image/tech/8.png';
+// Category Banner Images
 import flagDE from '../assets/Layout1/Image/flags/DE@2x.png';
+
 
 const ProductDetails = ({ setPage, product, addToCart, toggleFavorite, favorites }) => {
    const [selectedThumb, setSelectedThumb] = React.useState(0);
-   const [relatedProducts, setRelatedProducts] = React.useState([]);
-   const [loadingRelated, setLoadingRelated] = React.useState(false);
-   const [recommendedProducts, setRecommendedProducts] = React.useState([]);
    const [activeTab, setActiveTab] = React.useState('description');
-   const [reviews, setReviews] = React.useState([]);
    const [newReview, setNewReview] = React.useState({ rating: 5, comment: '', name: '' });
-   const [loadingReviews, setLoadingReviews] = React.useState(false);
    const isFavorite = favorites.some(f => f.id === product?.id);
+
+   const { data: relatedProducts = [], isLoading: loadingRelated } = useRelatedProducts(product?.category, product?.id);
+   const { data: reviews = [], isLoading: loadingReviews, refetch: refetchReviews } = useReviews(product?.id);
+   
+   // We can reuse related products for recommended as well or just slice differently
+   const recommendedProducts = relatedProducts.slice(0, 4);
+
+   const handleBack = () => {
+      setPage('listing');
+   };
 
    // Product images will be fetched from Supabase
    const thumbnails = product ? [product.image_url] : [];
 
    React.useEffect(() => {
-      if (product?.category) {
-         fetchRelatedProducts();
-         fetchRecommendedProducts();
-         fetchReviews();
-      }
       window.scrollTo(0, 0);
    }, [product]);
 
-   const fetchRelatedProducts = async () => {
-      try {
-         setLoadingRelated(true);
-         const { data, error } = await supabase
-            .from('products')
-            .select('*')
-            .eq('category', product.category)
-            .neq('id', product.id)
-            .limit(6);
-
-         if (error) throw error;
-         setRelatedProducts(data || []);
-      } catch (error) {
-         console.error('Error fetching related products:', error);
-      } finally {
-         setLoadingRelated(false);
-      }
-   };
-
-   const fetchRecommendedProducts = async () => {
-      try {
-         const { data, error } = await supabase
-            .from('products')
-            .select('*')
-            .eq('category', product.category)
-            .neq('id', product.id)
-            .limit(4);
-
-         if (error) throw error;
-         setRecommendedProducts(data || []);
-      } catch (error) {
-         console.error('Error fetching recommended products:', error);
-      }
-   };
-
-   const fetchReviews = async () => {
-      try {
-         setLoadingReviews(true);
-         const { data, error } = await supabase
-            .from('reviews')
-            .select('*')
-            .eq('product_id', product.id)
-            .order('created_at', { ascending: false });
-
-         if (error) throw error;
-         setReviews(data || []);
-      } catch (error) {
-         console.error('Error fetching reviews:', error);
-         setReviews([]);
-      } finally {
-         setLoadingReviews(false);
-      }
-   };
 
    const handleSubmitReview = async () => {
       if (!newReview.comment.trim() || !newReview.name.trim()) {
@@ -108,8 +52,9 @@ const ProductDetails = ({ setPage, product, addToCart, toggleFavorite, favorites
 
          // Reset form and refresh reviews
          setNewReview({ rating: 5, comment: '', name: '' });
-         await fetchReviews();
+         await refetchReviews();
          alert('Review submitted successfully!');
+
       } catch (error) {
          console.error('Error submitting review:', error);
          alert('Failed to submit review. Please try again.');
@@ -118,16 +63,24 @@ const ProductDetails = ({ setPage, product, addToCart, toggleFavorite, favorites
 
    return (
       <div className="container py-4">
-         {/* Breadcrumbs */}
-         <div className="flex flex-wrap items-center gap-2 text-[#8B96A5] text-sm mb-6">
-            <span className="cursor-pointer hover:text-primary transition-colors" onClick={() => setPage('home')}>Home</span>
-            <ChevronRight className="w-4 h-4" />
-            <span className="cursor-pointer hover:text-primary transition-colors">Clothings</span>
-            <ChevronRight className="w-4 h-4" />
-            <span className="cursor-pointer hover:text-primary transition-colors">Men's wear</span>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-[#1C1C1C] font-normal">Summer clothing</span>
+         {/* Breadcrumbs & Back Button */}
+         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div className="flex flex-wrap items-center gap-2 text-[#8B96A5] text-sm">
+               <span className="cursor-pointer hover:text-primary transition-colors" onClick={() => setPage('home')}>Home</span>
+               <ChevronRight className="w-4 h-4" />
+               <span className="cursor-pointer hover:text-primary transition-colors" onClick={() => setPage('listing')}>All Products</span>
+               <ChevronRight className="w-4 h-4" />
+               <span className="text-[#1C1C1C] font-normal">{product?.name || 'Product Details'}</span>
+            </div>
+            <button
+               onClick={handleBack}
+               className="flex items-center gap-2 text-[#505050] hover:text-primary transition-colors font-medium"
+            >
+               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+               Back
+            </button>
          </div>
+
 
          {/* Main Content Card */}
          <div className="bg-white border border-[#DEE2E7] rounded-lg p-4 sm:p-5 lg:p-8 flex flex-col lg:flex-row gap-6 lg:gap-8 mb-8 shadow-sm">

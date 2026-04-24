@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Package, CheckCircle, XCircle, Clock, ExternalLink, RefreshCw, Eye, User, Phone, MapPin, CreditCard, Image as ImageIcon, Trash2 } from 'lucide-react';
 
-const AdminPanel = ({ setPage }) => {
+const AdminPanel = ({ setPage, handleBack }) => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState('all');
@@ -80,10 +80,19 @@ const AdminPanel = ({ setPage }) => {
     return (
         <div className="container py-8 max-w-7xl">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 className="text-3xl font-extrabold text-[#1C1C1C]">Admin Dashboard</h1>
-                    <p className="text-[#505050]">Manage and verify customer orders</p>
+                <div className="flex items-start gap-4">
+                    <button
+                        onClick={handleBack}
+                        className="mt-1 p-2 hover:bg-[#F7F7F7] rounded-lg text-[#8B96A5] transition-colors"
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    </button>
+                    <div>
+                        <h1 className="text-3xl font-extrabold text-[#1C1C1C]">Admin Dashboard</h1>
+                        <p className="text-[#505050]">Manage and verify customer orders</p>
+                    </div>
                 </div>
+
                 <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-[#DEE2E7]">
                     {['all', 'pending', 'confirmed', 'rejected'].map((status) => (
                         <button

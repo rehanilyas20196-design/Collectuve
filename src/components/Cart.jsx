@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { ChevronDown, ArrowLeft, Trash2, Heart, ShieldCheck, Truck, MessageSquare, ShoppingCart } from 'lucide-react';
 
-const Cart = ({ setPage, cartItems, setCartItems, removeFromCart }) => {
+const Cart = ({ setPage, handleBack, cartItems, setCartItems, removeFromCart }) => {
     const [savedForLater, setSavedForLater] = useState([]);
+
 
     const removeItem = (id) => {
         removeFromCart(id);
@@ -48,11 +49,12 @@ const Cart = ({ setPage, cartItems, setCartItems, removeFromCart }) => {
                     <p className="text-[#8B96A5] mb-6">Looks like you haven't added anything to your cart yet.</p>
                     <button
                         className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-lg font-bold hover:bg-primary-dark transition-colors mx-auto"
-                        onClick={() => setPage('listing')}
+                        onClick={handleBack}
                     >
                         <ArrowLeft size={18} />
-                        Start shopping
+                        Back
                     </button>
+
                 </div>
             </div>
         );
@@ -115,11 +117,12 @@ const Cart = ({ setPage, cartItems, setCartItems, removeFromCart }) => {
                     <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-white p-4 rounded-lg border border-[#DEE2E7]">
                         <button
                             className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-lg font-bold hover:bg-primary-dark transition-colors"
-                            onClick={() => setPage('listing')}
+                            onClick={handleBack}
                         >
                             <ArrowLeft size={18} />
-                            Back to shop
+                            Back
                         </button>
+
                         <button
                             onClick={removeAllItems}
                             className="text-[#FA3434] font-bold hover:underline flex items-center gap-2"

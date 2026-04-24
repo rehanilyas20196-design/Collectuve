@@ -1,14 +1,35 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ShoppingBag, ArrowRight } from 'lucide-react';
+import { useOrders } from '../hooks/useProducts';
 
-const Orders = ({ setPage }) => {
-    const [orders, setOrders] = useState([]);
+const Orders = ({ setPage, handleBack, userProfile }) => {
+    const { data: orders = [], isLoading } = useOrders(userProfile?.id);
+
+    if (isLoading) {
+        return (
+            <div className="container py-8 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <p className="mt-4 text-[#8B96A5]">Loading your orders...</p>
+            </div>
+        );
+    }
+
 
     if (orders.length === 0) {
         return (
             <div className="container py-8">
                 <div className="bg-white border border-[#DEE2E7] rounded-lg p-8 shadow-sm">
-                    <h1 className="text-2xl font-bold mb-6">My Orders</h1>
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-2xl font-bold">My Orders</h1>
+                        <button
+                            onClick={handleBack}
+                            className="flex items-center gap-2 text-[#505050] hover:text-primary transition-colors font-medium"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                            Back
+                        </button>
+                    </div>
+
                     <div className="text-center py-12">
                         <div className="w-20 h-20 mx-auto mb-4 bg-[#F7F7F7] rounded-full flex items-center justify-center">
                             <ShoppingBag className="w-10 h-10 text-[#8B96A5]" />
@@ -31,7 +52,17 @@ const Orders = ({ setPage }) => {
     return (
         <div className="container py-8">
             <div className="bg-white border border-[#DEE2E7] rounded-lg p-8 shadow-sm">
-                <h1 className="text-2xl font-bold mb-6">My Orders</h1>
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold">My Orders</h1>
+                    <button
+                        onClick={handleBack}
+                        className="flex items-center gap-2 text-[#505050] hover:text-primary transition-colors font-medium"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        Back
+                    </button>
+                </div>
+
                 <div className="space-y-6">
                     {orders.map((order) => (
                         <div key={order.id} className="border border-[#DEE2E7] rounded-lg overflow-hidden">

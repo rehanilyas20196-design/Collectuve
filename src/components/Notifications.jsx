@@ -68,7 +68,7 @@ const Notifications = ({ setPage }) => {
                         </div>
                         <h1 className="text-2xl font-bold text-dark">Notifications</h1>
                     </div>
-                    <button 
+                    <button
                         onClick={fetchNotifications}
                         className="text-primary font-bold hover:underline text-sm"
                     >
@@ -87,8 +87,8 @@ const Notifications = ({ setPage }) => {
                         </div>
                     ) : (
                         notifications.map((notif) => (
-                            <div 
-                                key={notif.id} 
+                            <div
+                                key={notif.id}
                                 className={`p-6 hover:bg-gray-50 transition-colors flex gap-4 cursor-pointer`}
                                 onClick={() => setPage('orders')}
                             >

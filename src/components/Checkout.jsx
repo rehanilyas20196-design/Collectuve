@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChevronRight, CreditCard, Landmark, Phone, ArrowLeft, CheckCircle2, Upload, ImageIcon, X, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-const Checkout = ({ setPage, cartItems, total }) => {
+const Checkout = ({ setPage, handleBack, cartItems, total }) => {
     const [formData, setFormData] = useState({
         fullName: '',
         phoneNumber: '',
@@ -109,12 +109,22 @@ const Checkout = ({ setPage, cartItems, total }) => {
     return (
         <div className="bg-[#f4f4f4] min-h-screen py-6 sm:py-8">
             <div className="container">
-                {/* Header / Breadcrumbs */}
-                <div className="flex flex-wrap items-center gap-2 text-[#8B96A5] text-sm mb-6">
-                    <span className="cursor-pointer hover:text-primary transition-colors" onClick={() => setPage('cart')}>Cart</span>
-                    <ChevronRight className="w-4 h-4" />
-                    <span className="text-[#1C1C1C] font-normal">Checkout</span>
+                {/* Header / Breadcrumbs & Back Button */}
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div className="flex flex-wrap items-center gap-2 text-[#8B96A5] text-sm">
+                        <span className="cursor-pointer hover:text-primary transition-colors" onClick={() => setPage('cart')}>Cart</span>
+                        <ChevronRight className="w-4 h-4" />
+                        <span className="text-[#1C1C1C] font-normal">Checkout</span>
+                    </div>
+                    <button
+                        onClick={handleBack}
+                        className="flex items-center gap-2 text-[#505050] hover:text-primary transition-colors font-medium"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        Back
+                    </button>
                 </div>
+
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Left Section: Information */}

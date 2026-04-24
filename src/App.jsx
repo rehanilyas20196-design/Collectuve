@@ -29,6 +29,8 @@ import AdminPanel from './components/AdminPanel';
 import SellerProfile from './components/SellerProfile';
 import Notifications from './components/Notifications';
 import { supabase } from './lib/supabase';
+import { useCategories, useConfirmedOrdersCount } from './hooks/useProducts';
+
 
 // Category Banner Images
 import homeBanner from './assets/Image/backgrounds/image 98.png';
@@ -54,75 +56,20 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [navigationData, setNavigationData] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [confirmedOrdersCount, setConfirmedOrdersCount] = useState(0);
 
-  // Category items will be fetched from Supabase
-  const [categories, setCategories] = useState({});
-  const [categoryList, setCategoryList] = useState([]);
+
+  // Category items will be fetched from Supabase via React Query
+  const { categories, categoryList } = useCategories();
+  const { data: confirmedOrdersCountResult } = useConfirmedOrdersCount(userProfile?.id);
+  const confirmedOrdersCount = confirmedOrdersCountResult || 0;
+
 
   useEffect(() => {
     const totalCount = cartItems.reduce((sum, item) => sum + (item.qty || 1), 0);
     setCartCount(totalCount);
   }, [cartItems]);
 
-  useEffect(() => {
-    fetchAllCategoryItems();
-  }, []);
 
-  useEffect(() => {
-    if (userProfile?.id) {
-      fetchConfirmedOrdersCount();
-    } else {
-      setConfirmedOrdersCount(0);
-    }
-  }, [userProfile]);
-
-  const fetchConfirmedOrdersCount = async () => {
-    try {
-      const { count, error } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'confirmed');
-      // In a real app, you'd filter by user_id here too
-      // .eq('user_id', userProfile.id);
-
-      if (error) throw error;
-      setConfirmedOrdersCount(count || 0);
-    } catch (error) {
-      console.error('Error fetching confirmed orders count:', error);
-    }
-  };
-
-  const fetchAllCategoryItems = async () => {
-    try {
-      // Fetch all products
-      const { data: allProducts, error } = await supabase
-        .from('products')
-        .select('*');
-
-      if (error) throw error;
-
-      if (allProducts && allProducts.length > 0) {
-        // Get unique categories
-        const uniqueCategories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
-        setCategoryList(uniqueCategories);
-
-        // Group products by category (max 8 per category)
-        const categoryGroups = {};
-        uniqueCategories.forEach(cat => {
-          const catKey = cat.toLowerCase().replace(/\s+/g, '');
-          const productsInCat = allProducts
-            .filter(p => p.category === cat)
-            .slice(0, 8);
-          categoryGroups[cat] = productsInCat;
-        });
-
-        setCategories(categoryGroups);
-      }
-    } catch (error) {
-      console.error('Error fetching category items:', error);
-    }
-  };
 
   const addToCart = (product) => {
     if (!userProfile) {
@@ -173,6 +120,8 @@ function App() {
     });
   };
 
+  const [history, setHistory] = useState([]);
+
   const handleSetPage = (page, data = null) => {
     if (page === 'promo-modal') {
       setShowPromoModal(true);
@@ -185,6 +134,11 @@ function App() {
       setCurrentPage('profile');
       window.dispatchEvent(new CustomEvent('setAuthMode', { detail: 'login' }));
       return;
+    }
+
+    // Save current state to history if it's a different page
+    if (page !== currentPage) {
+      setHistory(prev => [...prev, { page: currentPage, category: selectedCategory, query: searchQuery, product: selectedProduct, data: navigationData }]);
     }
 
     if (page === 'listing') {
@@ -202,55 +156,72 @@ function App() {
     setCurrentPage(page);
   };
 
+  const handleBack = () => {
+    if (history.length === 0) {
+      setCurrentPage('home');
+      return;
+    }
+
+    const lastState = history[history.length - 1];
+    setHistory(prev => prev.slice(0, -1));
+
+    setCurrentPage(lastState.page);
+    setSelectedCategory(lastState.category);
+    setSearchQuery(lastState.query);
+    setSelectedProduct(lastState.product);
+    setNavigationData(lastState.data);
+  };
+
   const renderContent = () => {
     switch (currentPage) {
       case 'listing':
-        return <ProductListing setPage={handleSetPage} category={selectedCategory} query={searchQuery} addToCart={addToCart} toggleFavorite={toggleFavorite} favorites={favorites} />;
+        return <ProductListing setPage={handleSetPage} handleBack={handleBack} category={selectedCategory} query={searchQuery} addToCart={addToCart} toggleFavorite={toggleFavorite} favorites={favorites} />;
       case 'details':
-        return <ProductDetails setPage={handleSetPage} product={selectedProduct} addToCart={addToCart} toggleFavorite={toggleFavorite} favorites={favorites} />;
+        return <ProductDetails setPage={handleSetPage} handleBack={handleBack} product={selectedProduct} addToCart={addToCart} toggleFavorite={toggleFavorite} favorites={favorites} />;
       case 'admin':
-        return <AdminPanel setPage={handleSetPage} />;
+        return <AdminPanel setPage={handleSetPage} handleBack={handleBack} />;
       case 'seller-profile':
-        return <SellerProfile setPage={handleSetPage} sellerData={navigationData} addToCart={addToCart} toggleFavorite={toggleFavorite} favorites={favorites} />;
+        return <SellerProfile setPage={handleSetPage} handleBack={handleBack} sellerData={navigationData} addToCart={addToCart} toggleFavorite={toggleFavorite} favorites={favorites} />;
       case 'cart':
-        return <Cart setPage={handleSetPage} cartItems={cartItems} setCartItems={setCartItems} removeFromCart={removeFromCart} />;
+        return <Cart setPage={handleSetPage} handleBack={handleBack} cartItems={cartItems} setCartItems={setCartItems} removeFromCart={removeFromCart} />;
       case 'favorites':
-        return <ProductListing setPage={handleSetPage} category="My Favorites" productsOverride={favorites} addToCart={addToCart} toggleFavorite={toggleFavorite} favorites={favorites} />;
+        return <ProductListing setPage={handleSetPage} handleBack={handleBack} category="My Favorites" productsOverride={favorites} addToCart={addToCart} toggleFavorite={toggleFavorite} favorites={favorites} />;
       case 'checkout':
-        return <Checkout setPage={handleSetPage} cartItems={navigationData?.id ? [navigationData] : cartItems} total={navigationData?.total || cartItems.reduce((acc, item) => acc + (item.price * (item.qty || 1)), 0)} />;
+        return <Checkout setPage={handleSetPage} handleBack={handleBack} cartItems={navigationData?.id ? [navigationData] : cartItems} total={navigationData?.total || cartItems.reduce((acc, item) => acc + (item.price * (item.qty || 1)), 0)} />;
       case 'profile':
-        return <Profile setPage={handleSetPage} setIsAdmin={setIsAdmin} userProfile={userProfile} setUserProfile={setUserProfile} />;
+        return <Profile setPage={handleSetPage} handleBack={handleBack} setIsAdmin={setIsAdmin} userProfile={userProfile} setUserProfile={setUserProfile} />;
       case 'message':
-        return <Chatbot setPage={handleSetPage} />;
+        return <Chatbot setPage={handleSetPage} handleBack={handleBack} />;
       case 'orders':
-        return <Orders setPage={handleSetPage} />;
+        return <Orders setPage={handleSetPage} handleBack={handleBack} userProfile={userProfile} />;
       case 'notifications':
-        return <Notifications setPage={handleSetPage} />;
+        return <Notifications setPage={handleSetPage} handleBack={handleBack} />;
       case 'hot-offers':
-        return <HotOffers setPage={handleSetPage} />;
+        return <HotOffers setPage={handleSetPage} handleBack={handleBack} />;
       case 'gift-boxes':
-        return <GiftBoxes setPage={handleSetPage} />;
+        return <GiftBoxes setPage={handleSetPage} handleBack={handleBack} />;
       case 'projects':
-        return <Projects setPage={handleSetPage} />;
+        return <Projects setPage={handleSetPage} handleBack={handleBack} />;
       case 'menu-items':
-        return <MenuItems setPage={handleSetPage} />;
+        return <MenuItems setPage={handleSetPage} handleBack={handleBack} />;
       case 'help-center':
-        return <HelpCenter setPage={handleSetPage} />;
+        return <HelpCenter setPage={handleSetPage} handleBack={handleBack} />;
       case 'contact-us':
-        return <ContactUs setPage={handleSetPage} helpTopic={navigationData?.helpTopic || null} />;
+        return <ContactUs setPage={handleSetPage} handleBack={handleBack} helpTopic={navigationData?.helpTopic || null} />;
       case 'shipping-info':
-        return <ShippingInfo setPage={handleSetPage} />;
+        return <ShippingInfo setPage={handleSetPage} handleBack={handleBack} />;
       case 'returns-info':
-        return <ReturnsInfo setPage={handleSetPage} />;
+        return <ReturnsInfo setPage={handleSetPage} handleBack={handleBack} />;
       case 'faq':
-        return <FAQ setPage={handleSetPage} />;
+        return <FAQ setPage={handleSetPage} handleBack={handleBack} />;
+
       default:
         return (
           <div className="container">
             <Hero setPage={handleSetPage} />
             <Deals setPage={handleSetPage} />
 
-            {categoryList.map((cat, index) => (
+            {(categoryList ?? []).map((cat, index) => (
               <CategorySection
                 key={cat}
                 title={cat}
@@ -259,10 +230,16 @@ function App() {
                   '#E3F2FD', '#F7F7F7', '#E8F5E9', '#FCE4EC'
                 ][index % 8]}
                 bannerImg={[
-                  electronicsBanner, clothesBanner, interiorBanner, petsBanner,
-                  sportsBanner, homeBanner, beautyBanner, sportsBanner
+                  electronicsBanner,
+                  clothesBanner,
+                  interiorBanner,
+                  petsBanner,
+                  sportsBanner,
+                  homeBanner,
+                  beautyBanner,
+                  sportsBanner
                 ][index % 8]}
-                items={categories[cat] || []}
+                items={categories?.[cat] ?? []}
                 setPage={handleSetPage}
                 category={cat}
               />

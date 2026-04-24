@@ -1,30 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import React from 'react';
+import { useRecommendedItems } from '../hooks/useProducts';
 
 const RecommendedItems = () => {
-  // Recommended items will be fetched from Supabase
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items = [], isLoading: loading } = useRecommendedItems();
 
-  useEffect(() => {
-    fetchRecommendedItems();
-  }, []);
-
-  const fetchRecommendedItems = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('recommended_items')
-        .select('*');
-
-      if (error) throw error;
-      setItems(data || []);
-    } catch (error) {
-      console.error('Error fetching recommended items:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <section className="mt-8">

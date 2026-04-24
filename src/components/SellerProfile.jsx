@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Star, ShieldCheck, Globe, MapPin, Calendar, Mail, Phone, MessageSquare, ChevronRight, Filter, Search, Grid, List as ListIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-const SellerProfile = ({ setPage, sellerData, addToCart, toggleFavorite, favorites }) => {
+const SellerProfile = ({ setPage, handleBack, sellerData, addToCart, toggleFavorite, favorites }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewType, setViewType] = useState('grid');
@@ -56,7 +56,19 @@ const SellerProfile = ({ setPage, sellerData, addToCart, toggleFavorite, favorit
       <div className="bg-primary h-32 sm:h-48 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary to-[#005ADE] opacity-90"></div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20"></div>
+        
+        {/* Back Button */}
+        <div className="container relative h-full flex items-center">
+            <button
+                onClick={handleBack}
+                className="flex items-center gap-2 text-white/80 hover:text-white transition-colors font-medium bg-white/10 backdrop-blur-md px-4 py-2 rounded-lg"
+            >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Back
+            </button>
+        </div>
       </div>
+
 
       <div className="container -mt-16 sm:-mt-24 relative z-10">
         <div className="flex flex-col lg:flex-row gap-8">

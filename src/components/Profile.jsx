@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
-const Profile = ({ setPage, setIsAdmin, userProfile, setUserProfile }) => {
+const Profile = ({ setPage, handleBack, setIsAdmin, userProfile, setUserProfile }) => {
     const [isLogin, setIsLogin] = useState(true);
+
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -90,10 +91,10 @@ const Profile = ({ setPage, setIsAdmin, userProfile, setUserProfile }) => {
                         </div>
 
                         <button
-                            onClick={() => setPage('home')}
+                            onClick={handleBack}
                             className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-lg font-medium transition-all"
                         >
-                            Back to Home
+                            Back
                         </button>
                         <button
                             onClick={() => {
@@ -295,10 +296,11 @@ const Profile = ({ setPage, setIsAdmin, userProfile, setUserProfile }) => {
 
                 <div className="text-center mt-6">
                     <button
-                        onClick={() => setPage('home')}
-                        className="text-[#8B96A5] hover:text-primary transition-colors"
+                        onClick={handleBack}
+                        className="text-[#8B96A5] hover:text-primary transition-colors flex items-center justify-center gap-2 mx-auto"
                     >
-                        ← Back to home
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        Back
                     </button>
                 </div>
             </div>
