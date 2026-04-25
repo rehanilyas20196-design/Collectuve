@@ -63,13 +63,40 @@ function App() {
   const { data: confirmedOrdersCountResult } = useConfirmedOrdersCount(userProfile?.id);
   const confirmedOrdersCount = confirmedOrdersCountResult || 0;
 
+  useEffect(() => {
+    // Check active sessions and sets the user
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUserProfile({
+          id: session.user.id,
+          name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+          email: session.user.email
+        });
+        setIsAdmin(session.user.email === 'rehanilyas20196@gmail.com');
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUserProfile({
+          id: session.user.id,
+          name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+          email: session.user.email
+        });
+        setIsAdmin(session.user.email === 'rehanilyas20196@gmail.com');
+      } else {
+        setUserProfile(null);
+        setIsAdmin(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const totalCount = cartItems.reduce((sum, item) => sum + (item.qty || 1), 0);
     setCartCount(totalCount);
   }, [cartItems]);
-
-
 
   const addToCart = (product) => {
     if (!userProfile) {

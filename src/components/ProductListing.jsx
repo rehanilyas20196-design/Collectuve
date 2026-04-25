@@ -14,10 +14,20 @@ const ProductListing = ({ setPage, handleBack, category, query, productsOverride
   const { categoryList: categoryOptions, isLoading: categoriesLoading } = useCategories();
 
   const loading = productsLoading || categoriesLoading;
-  const products = useMemo(() => (productsData || []).map((product) => ({
-    ...product,
-    image_url: product.image_url || product.image || '',
-  })), [productsData]);
+  const products = useMemo(() => {
+    const normalized = (productsData || []).map((product) => ({
+      ...product,
+      image_url: product.image_url || product.image || '',
+    }));
+
+    const seenKeys = new Set();
+    return normalized.filter((product) => {
+      const key = product.name ? product.name.trim().toLowerCase() : String(product.id);
+      if (seenKeys.has(key)) return false;
+      seenKeys.add(key);
+      return true;
+    });
+  }, [productsData]);
 
   const itemsPerPage = 20;
   const isFavoritesPage = category === 'My Favorites';
