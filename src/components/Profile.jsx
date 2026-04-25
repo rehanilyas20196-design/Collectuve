@@ -6,6 +6,7 @@ const Profile = ({ setPage, handleBack, setIsAdmin, userProfile, setUserProfile 
     const [isLogin, setIsLogin] = useState(true);
 
     const [showPassword, setShowPassword] = useState(false);
+    const [authMessage, setAuthMessage] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -47,43 +48,70 @@ const Profile = ({ setPage, handleBack, setIsAdmin, userProfile, setUserProfile 
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setAuthMessage('');
 
-        if (isLogin && formData.email === 'rehanilyas20196@gmail.com' && formData.password === 'pak@2233') {
-            setIsAdmin(true);
-            setUserProfile({
-                name: 'Admin',
-                email: formData.email
-            });
-            alert('Admin logged in successfully!');
-            setPage('home');
+        if (!formData.email || !formData.password) {
+            setAuthMessage('Please enter both email and password.');
             return;
         }
 
         if (isLogin) {
-            setIsAdmin(false);
-            setUserProfile({
-                name: formData.email.split('@')[0],
-                email: formData.email
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: formData.email,
+                password: formData.password,
             });
-            alert('Logged in successfully!');
-            setPage('home');
+
+            if (error) {
+                setAuthMessage(error.message || 'Unable to login. Please check your credentials.');
+                return;
+            }
+
+            const user = data?.user;
+            if (user) {
+                setAuthMessage('Login successful ✅');
+                setIsAdmin(user.email === 'rehanilyas20196@gmail.com');
+                setUserProfile({
+                    name: user.user_metadata?.full_name || user.email.split('@')[0],
+                    email: user.email,
+                });
+                setPage('home');
+                return;
+            }
+
+            setAuthMessage('Login successful. Redirecting...');
             return;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            alert('Passwords do not match.');
+            setAuthMessage('Passwords do not match.');
             return;
         }
 
-        setIsAdmin(false);
-        setUserProfile({
-            name: formData.name,
-            email: formData.email
+        const { data, error } = await supabase.auth.signUp({
+            email: formData.email,
+            password: formData.password,
+            options: {
+                data: {
+                    full_name: formData.name,
+                    joiningDate: formData.joiningDate,
+                },
+            },
         });
-        alert('Account created successfully!');
-        setPage('home');
+
+        if (error) {
+            setAuthMessage(error.message || 'Unable to create account.');
+            return;
+        }
+
+        setAuthMessage('Signup successful ✔ Check your email to confirm your account.');
+        if (data?.user) {
+            setUserProfile({
+                name: data.user.user_metadata?.full_name || formData.name || data.user.email.split('@')[0],
+                email: data.user.email,
+            });
+        }
     };
 
     if (userProfile) {
@@ -268,6 +296,10 @@ const Profile = ({ setPage, handleBack, setIsAdmin, userProfile, setUserProfile 
                         >
                             {isLogin ? 'Sign In' : 'Create Account'}
                         </button>
+
+                        {authMessage && (
+                            <p className="text-sm text-center text-[#1F2937] mt-3">{authMessage}</p>
+                        )}
 
                         <div className="relative my-6">
                             <div className="absolute inset-0 flex items-center">
